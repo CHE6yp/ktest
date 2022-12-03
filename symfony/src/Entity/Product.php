@@ -4,30 +4,43 @@ namespace App\Entity;
 
 // use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Annotation\ApiFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use App\Repository\ProductRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ProductRepository::class)]
 #[ApiResource]
+#[ApiFilter(SearchFilter::class, properties: [
+    'name' => 'exact',
+    'description' => 'exact',
+    'weight' => 'exact',
+    'category' => 'exact',
+])]
+#[ApiFilter(OrderFilter::class, properties: ['id', 'name', 'description', 'weight', 'category'],
+    arguments: ['orderParameterName' => 'order']
+)]
+
 class Product
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    private ?int $id = null;
+    private int $id;
 
     #[ORM\Column(length: 255)]
-    private ?string $name = null;
+    private string $name;
 
     #[ORM\Column(type: Types::TEXT)]
-    private ?string $description = null;
+    private string $description;
 
     #[ORM\Column(length: 255)]
-    private ?string $weight = null;
+    private string $weight;
 
     #[ORM\Column(length: 255)]
-    private ?string $category = null;
+    private string $category;
 
     public function getId(): ?int
     {
