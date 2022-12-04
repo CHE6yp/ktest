@@ -62,6 +62,10 @@ class MediaObject
     #[ORM\Column(nullable: true)] 
     public ?string $filePath = null;
 
+    #[ApiProperty(types: ['https://schema.org/contentUrl'])]
+    #[Groups(['media_object:read'])]
+    public ?string $csvContentUrl = null;
+
     public function getId(): ?int
     {
         return $this->id;

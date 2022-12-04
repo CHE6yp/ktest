@@ -7,6 +7,7 @@ services:
             - "5469:5432"
         volumes:
             - ./docker-compose/data/postgres:/var/lib/postgres
+            - ./symfony:/usr/src/symfony
         environment:
             POSTGRES_USER: symfony
             POSTGRES_PASSWORD: symfony
