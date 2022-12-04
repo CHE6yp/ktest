@@ -1,4 +1,4 @@
-FROM php:8.0.7-fpm-alpine
+FROM php:8.1.12-fpm-alpine
 
 run apk update
 RUN apk add --no-cache coreutils \
