@@ -29,7 +29,7 @@ services:
     nginx:
         build: ./docker-compose/nginx
         ports:
-            - 80:80
+            - 8080:80
         volumes:
             - ./docker-compose/logs/nginx:/var/log/nginx:cached
             - ./symfony:/usr/src/symfony:cached
