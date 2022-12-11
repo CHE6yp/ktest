@@ -1,4 +1,26 @@
 <template>
+  <div>
+    <div class="form" v-show="!isUploading">
+      <label
+        :class="{'label--uploaded': this.file}"
+        class="label"
+      >
+        
+
+        <span>{{this.file ?  this.file.name : 'Выберите файл'}}</span>
+
+        <input type="file" @change="uploadFile" ref="file">
+      </label>
+      <button class="submit" @click="submitFile">Upload!</button>
+    </div>
+    
+    <div v-show="isUploading" id='preloader'>
+      <svg class='spinner' height='50px' viewBox='0 0 66 66' width='50px' xmlns='http://www.w3.org/2000/svg'>
+         <circle class='path' cx='33' cy='33' fill='none' r='30' stroke-linecap='round' stroke-width='4'/>
+      </svg>
+    </div>
+  </div>
+
   <br>
   <br>
   <span>Всего позиций - {{totalItems}}</span>
@@ -38,21 +60,21 @@
     <table>
       <tr>
         <th >
-          <span @click="sort('id')">id {{sorting.id? ' ('+sorting.id+')':''}}</span></th>
+          <span class="sorting" @click="sort('id')">id {{sorting.id? ' ('+sorting.id+')':''}}</span></th>
         <th >
-          <span @click="sort('name')">name {{sorting.name? ' ('+sorting.name+')':''}}</span> <br>
+          <span class="sorting" @click="sort('name')">name {{sorting.name? ' ('+sorting.name+')':''}}</span> <br>
           <input v-model="searchFilters.name" type="text" @input="search">
         </th>
         <th >
-          <span @click="sort('category')">category {{sorting.category? ' ('+sorting.category+')':''}}</span> <br>
+          <span class="sorting" @click="sort('category')">category {{sorting.category? ' ('+sorting.category+')':''}}</span> <br>
           <input v-model="searchFilters.category" type="text" @input="search">
         </th>
         <th >
-          <span @click="sort('description')">description {{sorting.description? ' ('+sorting.description+')':''}}</span> <br>
+          <span class="sorting" @click="sort('description')">description {{sorting.description? ' ('+sorting.description+')':''}}</span> <br>
           <input v-model="searchFilters.description" type="text" @input="search">
         </th>
         <th >
-          <span @click="sort('weight')">weight {{sorting.weight? ' ('+sorting.weight+')':''}}</span> <br>
+          <span class="sorting" @click="sort('weight')">weight {{sorting.weight? ' ('+sorting.weight+')':''}}</span> <br>
           <input v-model="searchFilters.weight" type="text" @input="search">
         </th>
       </tr>
@@ -80,6 +102,7 @@ export default {
   data () {
     return {
       file: null,
+      isUploading: false,
       response: null,
       items: null,
       sorting: {
@@ -100,6 +123,25 @@ export default {
     };
   },
   methods: {
+    uploadFile() {
+      this.file = this.$refs.file.files[0];
+    },
+    submitFile() {
+      this.isUploading = true
+      const formData = new FormData();
+      formData.append('file', this.file);
+      const headers = { 'Content-Type': 'multipart/form-data' };
+      axios.post('http://localhost:8080/api/media_objects', formData, { headers })
+        .then((res) => {
+          res.data.files; // binary representation of the file
+          res.status; // HTTP status
+          window.location.href = "http://localhost:8080"+res.data['csvContentUrl'];
+        })
+        .finally(() => {
+          this.isUploading = false
+          this.buildQuery();
+        });
+    },
     search() {
       this.buildQuery();
     },
@@ -210,4 +252,58 @@ tr:nth-child(even) {
   cursor: not-allowed;
   opacity: .4;
 }
+
+.sorting {
+  cursor: pointer;
+}
+
+.form {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100px;
+}
+
+.label {
+  width: 360px;
+  height: 56px;
+  background: #eee;
+  padding: 0 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  border: none;
+  outline: none;
+  cursor: pointer;
+}
+
+.label--uploaded {
+  background-color: #cfc;
+}
+
+.label input {
+  visibility: hidden;
+  width: 0;
+}
+
+.submit {
+  margin-left: 16px;
+  height: 56px;
+  padding: 0 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  border: none;
+  outline: none;
+  background: #edecea;
+}
+
+#preloader{position:relative;height: 100px;overflow:hidden;background:#fff;left:0;right:0;top:0;bottom:0;;z-index:9999}
+.spinner{position:absolute;top:calc(50% - 20px);left:calc(50% - 20px);animation:rotator 1.4s linear infinite}
+@keyframes rotator{0%{transform:rotate(0deg)}100%{transform:rotate(270deg)}}
+.path{stroke-dasharray:187;stroke-dashoffset:0;transform-origin:center;animation:dash 1.4s ease-in-out infinite,colors 5.6s ease-in-out infinite}
+@keyframes colors{0%{stroke:#4285F4}25%{stroke:#DE3E35}50%{stroke:#F7C223}75%{stroke:#1B9A59}100%{stroke:#4285F4}}
+@keyframes dash{0%{stroke-dashoffset:187}50%{stroke-dashoffset:46.75;transform:rotate(135deg)}100%{stroke-dashoffset:187;transform:rotate(450deg)}}
 </style>
