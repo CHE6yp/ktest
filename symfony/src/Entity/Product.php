@@ -18,10 +18,10 @@ use Doctrine\ORM\Mapping as ORM;
     ]
 )]
 #[ApiFilter(SearchFilter::class, properties: [
-    'name' => 'exact',
-    'description' => 'exact',
-    'weight' => 'exact',
-    'category' => 'exact',
+    'name' => 'partial',
+    'description' => 'partial',
+    'weight' => 'partial',
+    'category' => 'partial',
 ])]
 #[ApiFilter(OrderFilter::class, properties: ['id', 'name', 'description', 'weight', 'category'],
     arguments: ['orderParameterName' => 'order']
