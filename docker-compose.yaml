@@ -26,6 +26,15 @@ services:
         links:
             - db
 
+    vue:
+        build: docker-compose/vue
+        ports:
+            - 8081:8080
+        volumes:
+            - ./vue:/usr/src/vue
+        links:
+            - php-fpm
+
     nginx:
         build: ./docker-compose/nginx
         ports:
